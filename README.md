@@ -110,12 +110,18 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture explanation.
 
 ```
 markdown-desktop/
-├── README.md           # This file
-├── ARCHITECTURE.md     # Detailed architecture explanation
-├── kernel.md          # Kernel configuration (processes, filesystem)
-├── desktop.md         # Desktop environment configuration
-├── markdownos.py      # Runtime interpreter
-└── EXAMPLES.md        # Usage examples
+├── README.md              # This file
+├── VISION.md              # North Star goals and guiding principles
+├── ARCHITECTURE.md        # Detailed architecture explanation
+├── IMPLEMENTATION_PLAN.md # Detailed roadmap with micro-phases
+├── REVIEWERS.md           # Expert review framework
+├── kernel.md              # Kernel configuration (processes, filesystem)
+├── desktop.md             # Desktop environment configuration
+├── markdownos.py          # Runtime interpreter
+├── EXAMPLES.md            # Usage examples
+└── reviews/               # Review archive for each phase
+    ├── README.md
+    └── REVIEW_TEMPLATE.md
 ```
 
 ## Why This Matters
@@ -180,17 +186,47 @@ Booting MarkdownOS v0.1.0...
 ============================================================
 ```
 
+## Development Roadmap
+
+MarkdownOS is actively being developed with a clear vision and roadmap:
+
+### North Star Goal
+> "The killer feature isn't markdown itself—it's removing fear from systems programming."
+
+See [VISION.md](VISION.md) for our guiding principles and three pillars:
+1. **Learning Platform** - Teach OS concepts safely (Jessie Frazelle perspective)
+2. **AI-Native System** - Self-explaining, LLM-friendly (Simon Willison perspective)
+3. **Collaboration Tool** - GitOps and team workflows (Kelsey Hightower perspective)
+
+### Current Development
+
+**Phase 1: Foundation - Safe Experimentation** (In Planning)
+- Simulation mode for safe testing
+- Interactive tutorials for beginners
+- Validation and helpful error messages
+- Undo functionality
+- Progressive disclosure (quiet/verbose modes)
+
+See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for detailed micro-phase breakdown.
+
+### Review Process
+
+Every feature is reviewed from three expert perspectives:
+- **Kelsey Hightower** - Infrastructure & GitOps
+- **Simon Willison** - AI-First Tooling
+- **Jessie Frazelle** - Systems Accessibility
+
+See [REVIEWERS.md](REVIEWERS.md) for review framework.
+
 ## Contributing
 
-This is an experimental project. Ideas for improvement:
+We welcome contributions! Before contributing:
 
-1. Add more system calls to kernel.md
-2. Implement actual process execution
-3. Create a real virtual filesystem layer
-4. Add networking configuration
-5. Implement user management
-6. Create a graphical desktop version
-7. Add package management via markdown
+1. Read [VISION.md](VISION.md) to understand our goals
+2. Check [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for current work
+3. Follow the review process in [REVIEWERS.md](REVIEWERS.md)
+
+Key principle: Every change should **remove fear from systems programming**.
 
 ## License
 
