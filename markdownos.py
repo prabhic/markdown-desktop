@@ -881,8 +881,27 @@ PLAYGROUND_CHALLENGES = {
 }
 
 
-def run_playground():
-    """Interactive playground for kernel experimentation."""
+def print_playground_help():
+    """Print help for playground shell commands."""
+    print()
+    print("Playground Shell Commands:")
+    print("  list              - List all challenges")
+    print("  challenge <N>     - Start challenge N (1-5)")
+    print("  boot              - Boot the playground system")
+    print("  reset             - Reset playground to initial state")
+    print("  hint [N]          - Show hint (optionally for challenge N)")
+    print("  edit [target]     - Edit playground files")
+    print("                      'kernel' or 'k' - Edit playground-kernel.md")
+    print("                      'desktop' or 'd' - Edit playground-desktop.md")
+    print("                      (default: kernel)")
+    print("  status            - Show playground system status")
+    print("  help              - Show this help")
+    print("  exit / quit       - Exit playground shell")
+    print()
+
+
+def run_playground_shell():
+    """Interactive playground shell - persistent session."""
     import shutil
     import time
 
@@ -892,18 +911,9 @@ def run_playground():
 
     print("\n")
     print("╔════════════════════════════════════════════════════════╗")
-    print("║        🎮 MarkdownOS Playground                       ║")
+    print("║        🎮 MarkdownOS Playground Shell                 ║")
     print("║        Learn by Breaking Things Safely!               ║")
     print("╚════════════════════════════════════════════════════════╝")
-    print()
-    print("Welcome to the Playground - a safe space to experiment!")
-    print()
-    print("Available commands:")
-    print("  --playground           - Enter playground")
-    print("  --playground reset     - Reset playground files")
-    print("  --playground challenge <N> - Start challenge N")
-    print("  --playground boot      - Boot playground system")
-    print("  --playground list      - List all challenges")
     print()
 
     # Check if playground files exist
@@ -913,20 +923,122 @@ def run_playground():
         print("✓ Playground files created!")
         print()
 
-    # Show available challenges
-    print("=" * 60)
-    print("AVAILABLE CHALLENGES")
-    print("=" * 60)
+    print("Welcome to the interactive playground shell!")
+    print("Type 'help' for commands, 'exit' to quit.")
     print()
-    for num, challenge in PLAYGROUND_CHALLENGES.items():
-        print(f"{num}. {challenge['title']}")
-        print(f"   {challenge['description']}")
-        print()
+    print("Quick start:")
+    print("  • Type 'list' to see all challenges")
+    print("  • Type 'challenge 1' to start first challenge")
+    print("  • Type 'edit' to modify playground-kernel.md")
+    print("  • Type 'boot' to test your changes")
+    print()
 
-    print("Ready to start?")
-    print("  Try: python3 markdownos.py --playground challenge 1")
-    print("  Or: python3 markdownos.py --playground boot (to test current config)")
-    print()
+    # Interactive shell loop
+    while True:
+        try:
+            command_line = input("playground> ").strip()
+
+            if not command_line:
+                continue
+
+            parts = command_line.split()
+            command = parts[0].lower()
+            args = parts[1:] if len(parts) > 1 else []
+
+            if command in ["exit", "quit", "q"]:
+                print("\nExiting playground. Happy learning! 🚀\n")
+                break
+
+            elif command == "help" or command == "h":
+                print_playground_help()
+
+            elif command == "list" or command == "ls":
+                playground_list()
+
+            elif command == "challenge" or command == "c":
+                if args:
+                    try:
+                        challenge_num = int(args[0])
+                        playground_challenge(challenge_num)
+                    except ValueError:
+                        print("❌ Challenge number must be an integer (1-5)")
+                else:
+                    print("❌ Please specify a challenge number")
+                    print("Usage: challenge <N>")
+                    print("Example: challenge 1")
+
+            elif command == "boot" or command == "b":
+                playground_boot()
+
+            elif command == "reset" or command == "r":
+                playground_reset()
+
+            elif command == "hint":
+                if args:
+                    try:
+                        challenge_num = int(args[0])
+                        playground_hint(challenge_num)
+                    except ValueError:
+                        playground_hint()
+                else:
+                    playground_hint()
+
+            elif command == "edit" or command == "e":
+                # Determine which file to edit
+                target = args[0].lower() if args else "kernel"
+
+                if target in ["kernel", "k"]:
+                    editor = os.environ.get('EDITOR', 'nano')
+                    print(f"\nOpening playground-kernel.md with {editor}...")
+                    print("(Edit the file, save, and return here to continue)\n")
+                    subprocess.run([editor, playground_kernel])
+                    print("\n✓ Back in playground shell")
+                elif target in ["desktop", "d"]:
+                    editor = os.environ.get('EDITOR', 'nano')
+                    print(f"\nOpening playground-desktop.md with {editor}...")
+                    print("(Edit the file, save, and return here to continue)\n")
+                    subprocess.run([editor, playground_desktop])
+                    print("\n✓ Back in playground shell")
+                else:
+                    print(f"❌ Unknown target: {target}")
+                    print("Valid targets: kernel, desktop")
+
+            elif command == "status" or command == "s":
+                # Load and show playground system status
+                if os.path.exists(playground_kernel):
+                    try:
+                        class PlaygroundOS(MarkdownOS):
+                            def __init__(self, base_path):
+                                self.base_path = Path(base_path)
+                                self.kernel = MarkdownKernel(playground_kernel)
+                                self.desktop = MarkdownDesktop(playground_desktop)
+
+                        os_instance = PlaygroundOS(base_path)
+                        os_instance.kernel.load()
+                        os_instance.kernel.show_status()
+                    except SystemExit:
+                        print("❌ Validation errors found. Fix them and try again.")
+                else:
+                    print("❌ Playground not initialized. Run 'reset' first.")
+
+            else:
+                print(f"❌ Unknown command: {command}")
+                print("Type 'help' for available commands")
+
+        except KeyboardInterrupt:
+            print("\n\n(Use 'exit' to quit the playground shell)")
+            continue
+        except EOFError:
+            print("\n\nExiting playground. Happy learning! 🚀\n")
+            break
+        except Exception as e:
+            print(f"\n❌ Error: {e}")
+            print("Type 'help' for available commands\n")
+
+
+def run_playground():
+    """Entry point for playground - launches interactive shell."""
+    run_playground_shell()
 
 
 def create_playground_files():
@@ -1285,13 +1397,26 @@ def main():
             print("  --menu        - Show application menu")
             print("  --help        - Show this help")
             print()
-            print("Playground Mode:")
-            print("  --playground           - Enter playground (safe experimentation)")
-            print("  --playground list      - List all challenges")
-            print("  --playground challenge <N> - Start challenge N")
-            print("  --playground boot      - Boot playground system")
-            print("  --playground reset     - Reset playground to initial state")
-            print("  --playground hint [N]  - Get hint for challenge N")
+            print("Playground Mode (Interactive Shell):")
+            print("  --playground           - Enter interactive playground shell")
+            print()
+            print("  Once in the shell, use these commands:")
+            print("    list              - List all challenges")
+            print("    challenge <N>     - Start challenge N")
+            print("    edit [kernel|desktop] - Edit playground files")
+            print("    boot              - Boot playground system")
+            print("    reset             - Reset to initial state")
+            print("    hint [N]          - Get hints")
+            print("    status            - Show system status")
+            print("    help              - Show help")
+            print("    exit              - Exit playground shell")
+            print()
+            print("  One-shot commands (for scripts/automation):")
+            print("    --playground list      - List all challenges")
+            print("    --playground challenge <N> - Start challenge N")
+            print("    --playground boot      - Boot playground system")
+            print("    --playground reset     - Reset playground to initial state")
+            print("    --playground hint [N]  - Get hint for challenge N")
             print()
             print("Output Modes:")
             print("  --quiet: Minimal output (best for beginners)")

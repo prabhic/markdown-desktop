@@ -88,26 +88,46 @@ python3 markdownos.py --explain filesystem
 
 ### Playground Mode (Learn Kernel Internals)
 
-Learn by breaking things! The playground provides a safe, isolated environment to experiment with kernel concepts through hands-on challenges.
+Learn by breaking things! The playground provides a **persistent interactive shell** where you can experiment with kernel concepts through hands-on challenges.
 
 ```bash
-# Enter the playground
+# Enter the interactive playground shell
 python3 markdownos.py --playground
 
-# List all challenges
-python3 markdownos.py --playground list
+# Once in the shell, you get a persistent session:
+playground> help              # Show all commands
+playground> list              # List all challenges
+playground> challenge 1       # Start challenge 1
+playground> edit              # Edit playground-kernel.md (opens in nano/vim)
+playground> boot              # Boot and see results immediately
+playground> reset             # Reset to start fresh
+playground> hint              # Get hints when stuck
+playground> status            # Show system status
+playground> exit              # Exit when done
+```
 
-# Start a specific challenge
-python3 markdownos.py --playground challenge 1
+**Why Interactive Shell?**
+- **Persistent session** - Stay in playground, no need to retype long commands
+- **Rapid feedback loop** - Edit → Boot → Observe → Repeat in seconds
+- **Built-in editor** - Type "edit" to modify files, returns to shell when done
+- **Low overhead** - Short commands (e.g., "boot" not "python3 markdownos.py --playground boot")
+- **Exploration-friendly** - Try challenges quickly without context switching
+- **Like kernel debugging** - Similar to GDB, kdb, or QEMU console experience
 
-# Boot your playground system
-python3 markdownos.py --playground boot
-
-# Reset to start fresh
-python3 markdownos.py --playground reset
-
-# Get hints
-python3 markdownos.py --playground hint
+**Quick Example Session:**
+```
+$ python3 markdownos.py --playground
+playground> list
+[Shows 5 challenges]
+playground> challenge 1
+[Shows "Remove init process" task]
+playground> edit
+[Opens nano with playground-kernel.md, remove init process, save]
+playground> boot
+[Error: PID 1 required! - Learning achieved!]
+playground> reset
+[Resets to working state]
+playground> exit
 ```
 
 **5 Challenges Available:**
@@ -123,12 +143,21 @@ python3 markdownos.py --playground hint
 - Each challenge teaches a kernel concept through intentional failure
 - Errors become learning opportunities
 - Reset anytime to start fresh
+- Interactive shell keeps you in flow state
+
+**One-shot commands** (for scripts/automation):
+```bash
+python3 markdownos.py --playground list
+python3 markdownos.py --playground challenge 1
+python3 markdownos.py --playground boot
+```
 
 **Use playground mode to:**
 - Learn kernel internals by experimenting
 - Understand what happens when things go wrong
 - Build confidence through hands-on practice
 - Master OS concepts through breaking and fixing
+- Rapid iteration without leaving your flow
 
 ### Boot the System
 
