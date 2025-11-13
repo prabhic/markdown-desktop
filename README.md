@@ -44,6 +44,28 @@ This will:
 - Preview configuration changes before applying
 - Build confidence in understanding system behavior
 
+### Learning Mode (Understanding OS Concepts)
+
+Get instant explanations of operating system concepts in plain English!
+
+```bash
+# List all available topics
+python3 markdownos.py --explain
+
+# Explain a specific concept
+python3 markdownos.py --explain init
+python3 markdownos.py --explain pid
+python3 markdownos.py --explain filesystem
+```
+
+**Available topics**: init, pid, process, filesystem, directory, autostart, command, permissions
+
+**Use learning mode to:**
+- Understand OS concepts without searching documentation
+- Learn what each configuration option means
+- Build foundational knowledge of system internals
+- Get context-specific examples from the codebase
+
 ### Boot the System
 
 ```bash

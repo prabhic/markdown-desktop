@@ -14,6 +14,120 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 
+# Educational explanations for OS concepts
+EXPLANATIONS = {
+    "init": """
+The 'init' process is the first program that starts when your system boots.
+
+Think of it like the manager of a company:
+- It starts up first (always PID 1)
+- It's responsible for starting all other processes
+- If init stops, everything else must stop too
+
+In MarkdownOS, init is defined in kernel.md.
+Look for "Process: init" with PID 1.
+
+Example: kernel.md lines 16-21
+    """,
+    "pid": """
+PID stands for Process ID - a unique number for each running program.
+
+Like a name tag at a conference:
+- Every process gets a number when it starts
+- No two processes can have the same PID
+- PID 1 is always the init process (it starts first)
+- The kernel assigns PIDs in order
+
+In MarkdownOS, you assign PIDs manually in kernel.md.
+Each process definition has a "PID" field.
+
+Example: kernel.md - look for "**PID**: 1"
+    """,
+    "process": """
+A process is a running program on your computer.
+
+Think of it like a task on your to-do list:
+- Each process does one job
+- It has its own memory space
+- It can be started, paused, or stopped
+- Multiple processes can run at the same time
+
+In MarkdownOS, processes are defined in kernel.md.
+Each "Process:" section creates one process.
+
+Example: kernel.md - sections starting with "### Process:"
+    """,
+    "filesystem": """
+A filesystem is how your computer organizes files and directories.
+
+Like a filing cabinet:
+- Files contain data (documents, photos, programs)
+- Directories are folders that organize files
+- Everything has a path (like /home/user/photo.jpg)
+- Permissions control who can read/write files
+
+In MarkdownOS, the filesystem is defined in kernel.md.
+Look for "Directory:" and "File:" sections.
+
+Example: kernel.md - sections starting with "### Directory:" or "### File:"
+    """,
+    "directory": """
+A directory (also called a folder) is a container for files and other directories.
+
+Like a folder in a filing cabinet:
+- Holds files and other directories
+- Has a path (like /home or /tmp)
+- Can have permissions (who can access it)
+- Creates organization in your filesystem
+
+In MarkdownOS, directories are defined in kernel.md.
+Each "Directory:" section creates one directory.
+
+Example: kernel.md - look for "### Directory: /home"
+    """,
+    "autostart": """
+Auto-start controls whether a process or application launches automatically at boot.
+
+Like programs that open when you turn on your computer:
+- "Auto Start: true" means it starts automatically
+- "Auto Start: false" means you start it manually
+- Useful for background services (like loggers)
+- Not needed for on-demand apps (like calculators)
+
+In MarkdownOS, autostart is defined in both kernel.md and desktop.md.
+Look for "**Auto Start**: true" or "**Auto Start**: false"
+    """,
+    "command": """
+A command is the actual program that runs when a process starts.
+
+Like instructions to execute:
+- It's usually the name of a program (like "bash" or "nginx")
+- Can include arguments (like "echo 'Hello'")
+- Tells the system what to do
+- Must be a valid executable
+
+In MarkdownOS, commands are defined in kernel.md and desktop.md.
+Look for "**Command**:" fields in process/app definitions.
+
+Example: "**Command**: `bash`"
+    """,
+    "permissions": """
+Permissions control who can read, write, or execute files.
+
+Like access levels on a document:
+- Read (r): Can view the file
+- Write (w): Can modify the file
+- Execute (x): Can run the file as a program
+- Format: 0644 means owner can write, everyone can read
+
+In MarkdownOS, permissions are defined in kernel.md.
+Look for "**Permissions**: 0644" in file definitions.
+
+Example: kernel.md - "**Permissions**: 0644"
+    """,
+}
+
+
 class MarkdownParser:
     """Parse markdown files to extract system configuration."""
     
@@ -362,6 +476,48 @@ class MarkdownOS:
         print()
 
 
+def explain_concept(topic: str = None):
+    """Explain OS concepts in plain language."""
+    if topic is None:
+        # List all available topics
+        print("\n" + "=" * 60)
+        print("MARKDOWNOS LEARNING MODE")
+        print("=" * 60)
+        print()
+        print("Get instant explanations of operating system concepts!")
+        print()
+        print("Available topics:")
+        print()
+        for topic_name in sorted(EXPLANATIONS.keys()):
+            print(f"  • {topic_name}")
+        print()
+        print("Usage: python3 markdownos.py --explain <topic>")
+        print("Example: python3 markdownos.py --explain init")
+        print()
+        print("=" * 60 + "\n")
+    elif topic.lower() in EXPLANATIONS:
+        # Show explanation for specific topic
+        topic_lower = topic.lower()
+        print("\n" + "=" * 60)
+        print(f"EXPLAINING: {topic_lower.upper()}")
+        print("=" * 60)
+        print(EXPLANATIONS[topic_lower].strip())
+        print()
+        print("=" * 60)
+        print(f"💡 Learn more: Try '--explain' to see all topics")
+        print("=" * 60 + "\n")
+    else:
+        # Unknown topic
+        print(f"\n❌ No explanation available for '{topic}'")
+        print()
+        print("Available topics:")
+        for topic_name in sorted(EXPLANATIONS.keys()):
+            print(f"  • {topic_name}")
+        print()
+        print("Usage: python3 markdownos.py --explain <topic>")
+        print()
+
+
 def main():
     """Main entry point."""
     if len(sys.argv) > 1:
@@ -371,6 +527,10 @@ def main():
         if command == "--simulate":
             os_instance = MarkdownOS(base_path)
             os_instance.simulate_boot()
+        elif command == "--explain":
+            # Get topic if provided
+            topic = sys.argv[2] if len(sys.argv) > 2 else None
+            explain_concept(topic)
         elif command == "--status":
             os_instance = MarkdownOS(base_path)
             os_instance.kernel.load()
@@ -385,11 +545,17 @@ def main():
             print("Usage: python3 markdownos.py [command]")
             print()
             print("Commands:")
-            print("  (none)      - Boot the system")
-            print("  --simulate  - Preview boot without making changes (safe mode)")
-            print("  --status    - Show system status")
-            print("  --menu      - Show application menu")
-            print("  --help      - Show this help")
+            print("  (none)        - Boot the system")
+            print("  --simulate    - Preview boot without making changes (safe mode)")
+            print("  --explain     - List all explainable OS concepts")
+            print("  --explain <topic> - Explain a specific OS concept (e.g. init, pid)")
+            print("  --status      - Show system status")
+            print("  --menu        - Show application menu")
+            print("  --help        - Show this help")
+            print()
+            print("Learning:")
+            print("  Try '--explain' to see what you can learn!")
+            print("  Example: python3 markdownos.py --explain init")
             print()
         else:
             print(f"Unknown command: {command}")
