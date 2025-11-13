@@ -269,12 +269,68 @@ class MarkdownDesktop:
 
 class MarkdownOS:
     """Main system controller."""
-    
+
     def __init__(self, base_path: str):
         self.base_path = Path(base_path)
         self.kernel = MarkdownKernel(str(self.base_path / "kernel.md"))
         self.desktop = MarkdownDesktop(str(self.base_path / "desktop.md"))
-    
+
+    def simulate_boot(self):
+        """Simulate boot without making any changes - preview mode."""
+        print("\n")
+        print("╔══════════════════════════════════════════════════════════╗")
+        print("║              🔍 SIMULATION MODE                          ║")
+        print("║         No actual changes will be made                   ║")
+        print("╚══════════════════════════════════════════════════════════╝")
+        print()
+
+        print("=" * 60)
+        print("Simulating System Boot...")
+        print("=" * 60)
+        print()
+
+        # Load configurations
+        print("[SIM] Loading kernel.md...")
+        self.kernel.load()
+        print(f"[SIM] ✓ Parsed {len(self.kernel.processes)} process definitions")
+        print(f"[SIM] ✓ Parsed {len(self.kernel.filesystem)} filesystem entries")
+        print()
+
+        print("[SIM] Loading desktop.md...")
+        self.desktop.load()
+        print(f"[SIM] ✓ Parsed {len(self.desktop.applications)} application definitions")
+        print()
+
+        # Show what would happen
+        print("[SIM] The following would occur during boot:")
+        print()
+
+        print("  Filesystem Initialization:")
+        for entry in self.kernel.filesystem:
+            action = "Create directory" if entry.type == "directory" else "Create file"
+            print(f"    → {action}: {entry.name}")
+        print()
+
+        print("  Process Startup:")
+        autostart_procs = [p for p in self.kernel.processes if p.autostart]
+        for process in sorted(autostart_procs, key=lambda p: int(p.pid or "999")):
+            print(f"    → Start {process.name} (PID {process.pid}): {process.command}")
+        print()
+
+        print("  Desktop Environment:")
+        autostart_apps = [a for a in self.desktop.applications if a.autostart]
+        for app in autostart_apps:
+            print(f"    → Launch {app.display_name}: {app.command}")
+        print()
+
+        print("=" * 60)
+        print("✓ Simulation Complete - No changes were made")
+        print("=" * 60)
+        print()
+        print("To actually boot the system, run: python3 markdownos.py")
+        print("To see more options, run: python3 markdownos.py --help")
+        print()
+
     def boot(self):
         """Boot the complete system."""
         print("\n")
@@ -283,17 +339,17 @@ class MarkdownOS:
         print("║                    Iteration 0                           ║")
         print("╚══════════════════════════════════════════════════════════╝")
         print()
-        
+
         # Load configurations
         self.kernel.load()
         self.desktop.load()
-        
+
         # Boot kernel
         self.kernel.boot()
-        
+
         # Start desktop
         self.desktop.start()
-        
+
         # Show info
         print("System is ready! Here's what you can do:")
         print()
@@ -311,8 +367,11 @@ def main():
     if len(sys.argv) > 1:
         command = sys.argv[1]
         base_path = os.path.dirname(os.path.abspath(__file__))
-        
-        if command == "--status":
+
+        if command == "--simulate":
+            os_instance = MarkdownOS(base_path)
+            os_instance.simulate_boot()
+        elif command == "--status":
             os_instance = MarkdownOS(base_path)
             os_instance.kernel.load()
             os_instance.kernel.show_status()
@@ -326,10 +385,11 @@ def main():
             print("Usage: python3 markdownos.py [command]")
             print()
             print("Commands:")
-            print("  (none)    - Boot the system")
-            print("  --status  - Show system status")
-            print("  --menu    - Show application menu")
-            print("  --help    - Show this help")
+            print("  (none)      - Boot the system")
+            print("  --simulate  - Preview boot without making changes (safe mode)")
+            print("  --status    - Show system status")
+            print("  --menu      - Show application menu")
+            print("  --help      - Show this help")
             print()
         else:
             print(f"Unknown command: {command}")

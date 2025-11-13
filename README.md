@@ -25,6 +25,25 @@ These are defined declaratively in markdown and interpreted by the runtime.
 
 ## Quick Start
 
+### Simulation Mode (Safe Experimentation)
+
+Preview system behavior without making any changes - perfect for learning!
+
+```bash
+python3 markdownos.py --simulate
+```
+
+This will:
+1. Parse kernel.md and desktop.md
+2. Show what WOULD happen during boot
+3. Display all processes, filesystem changes, and apps that would start
+4. Exit without making any actual changes
+
+**Use simulation mode to:**
+- Learn how the system works safely
+- Preview configuration changes before applying
+- Build confidence in understanding system behavior
+
 ### Boot the System
 
 ```bash
