@@ -836,6 +836,331 @@ def run_tutorial():
     print()
 
 
+# Playground challenges
+PLAYGROUND_CHALLENGES = {
+    1: {
+        "title": "The Missing Init Mystery",
+        "description": "The init process (PID 1) is missing! Try to boot and see what happens.",
+        "task": "Remove the init process from playground-kernel.md and try to boot.",
+        "learning": "Why every OS needs an init process (PID 1)",
+        "hint": "The init process is the first process that starts. Without it, no other processes can start!",
+        "validation": "missing_init",
+    },
+    2: {
+        "title": "PID Collision Course",
+        "description": "What happens when two processes fight for the same PID?",
+        "task": "Add a new process with PID 2 (same as shell) and try to boot.",
+        "learning": "Why PIDs must be unique",
+        "hint": "Each process needs its own unique identifier, like people need unique ID numbers.",
+        "validation": "duplicate_pid",
+    },
+    3: {
+        "title": "Permission Puzzle",
+        "description": "Explore how file permissions work.",
+        "task": "Create a file with permission 0000 (no access) and one with 0777 (full access).",
+        "learning": "How Unix permissions control file access",
+        "hint": "Permissions format: owner-group-others. Each digit: read(4) + write(2) + execute(1).",
+        "validation": "permissions",
+    },
+    4: {
+        "title": "Process Overload",
+        "description": "Add 10 new processes and watch the system handle them.",
+        "task": "Add 10 processes with PIDs 20-29, all with autostart=true.",
+        "learning": "How the kernel manages multiple processes",
+        "hint": "Copy the existing process template and change PIDs, names, and commands.",
+        "validation": "many_processes",
+    },
+    5: {
+        "title": "The Auto-Start Experiment",
+        "description": "Understand the difference between autostart and manual start.",
+        "task": "Set all processes to autostart=false except init. What happens?",
+        "learning": "How autostart controls process lifecycle",
+        "hint": "Only processes with autostart=true will run on boot.",
+        "validation": "autostart",
+    },
+}
+
+
+def run_playground():
+    """Interactive playground for kernel experimentation."""
+    import shutil
+    import time
+
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    playground_kernel = os.path.join(base_path, "playground-kernel.md")
+    playground_desktop = os.path.join(base_path, "playground-desktop.md")
+
+    print("\n")
+    print("╔════════════════════════════════════════════════════════╗")
+    print("║        🎮 MarkdownOS Playground                       ║")
+    print("║        Learn by Breaking Things Safely!               ║")
+    print("╚════════════════════════════════════════════════════════╝")
+    print()
+    print("Welcome to the Playground - a safe space to experiment!")
+    print()
+    print("Available commands:")
+    print("  --playground           - Enter playground")
+    print("  --playground reset     - Reset playground files")
+    print("  --playground challenge <N> - Start challenge N")
+    print("  --playground boot      - Boot playground system")
+    print("  --playground list      - List all challenges")
+    print()
+
+    # Check if playground files exist
+    if not os.path.exists(playground_kernel):
+        print("🎉 First time in playground! Creating playground files...")
+        create_playground_files()
+        print("✓ Playground files created!")
+        print()
+
+    # Show available challenges
+    print("=" * 60)
+    print("AVAILABLE CHALLENGES")
+    print("=" * 60)
+    print()
+    for num, challenge in PLAYGROUND_CHALLENGES.items():
+        print(f"{num}. {challenge['title']}")
+        print(f"   {challenge['description']}")
+        print()
+
+    print("Ready to start?")
+    print("  Try: python3 markdownos.py --playground challenge 1")
+    print("  Or: python3 markdownos.py --playground boot (to test current config)")
+    print()
+
+
+def create_playground_files():
+    """Create initial playground configuration files."""
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+    # Create playground-kernel.md
+    playground_kernel = os.path.join(base_path, "playground-kernel.md")
+    kernel_content = """# MarkdownOS Playground Kernel Configuration
+
+**This is your playground! Break things, experiment, and learn.**
+
+## System Information
+- **Name**: MarkdownOS Playground
+- **Version**: 0.1.0
+
+---
+
+## Processes
+
+### Process: init
+- **PID**: 1
+- **Command**: `echo "Playground Init Starting..."`
+- **Working Directory**: `/tmp`
+- **Auto Start**: true
+- **Description**: The init process - first process that starts
+
+### Process: shell
+- **PID**: 2
+- **Command**: `bash`
+- **Working Directory**: `/home/user`
+- **Auto Start**: true
+- **Description**: Interactive shell for user commands
+
+### Process: logger
+- **PID**: 3
+- **Command**: `echo "Logger ready" > /tmp/playground.log`
+- **Working Directory**: `/tmp`
+- **Auto Start**: true
+- **Description**: System logging service
+
+---
+
+## Filesystem
+
+### Directory: /home
+- **Type**: directory
+- **Permissions**: 0755
+- **Owner**: root
+- **Description**: User home directories
+
+### Directory: /tmp
+- **Type**: directory
+- **Permissions**: 0777
+- **Owner**: root
+- **Description**: Temporary files
+
+### File: /etc/hostname
+- **Type**: file
+- **Permissions**: 0644
+- **Owner**: root
+- **Content**: `playground`
+- **Description**: System hostname
+
+### File: /etc/motd
+- **Type**: file
+- **Permissions**: 0644
+- **Owner**: root
+- **Content**: |
+  ```
+  Welcome to MarkdownOS Playground!
+  This is a safe space to experiment.
+  ```
+- **Description**: Message of the day
+"""
+
+    with open(playground_kernel, 'w') as f:
+        f.write(kernel_content)
+
+    # Create playground-desktop.md
+    playground_desktop = os.path.join(base_path, "playground-desktop.md")
+    desktop_content = """# MarkdownOS Playground Desktop Configuration
+
+## Desktop Environment
+
+- **Name**: MarkdownDE Playground
+- **Version**: 0.1.0
+
+## Applications
+
+### Application: terminal
+- **Name**: Terminal Emulator
+- **Command**: `bash`
+- **Icon**: 💻
+- **Auto Start**: true
+- **Category**: System
+
+### Application: editor
+- **Name**: Nano Editor
+- **Command**: `nano`
+- **Icon**: 📝
+- **Auto Start**: false
+- **Category**: Accessories
+"""
+
+    with open(playground_desktop, 'w') as f:
+        f.write(desktop_content)
+
+
+def playground_boot():
+    """Boot the playground system."""
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    playground_kernel = os.path.join(base_path, "playground-kernel.md")
+    playground_desktop = os.path.join(base_path, "playground-desktop.md")
+
+    if not os.path.exists(playground_kernel):
+        print("❌ Playground not initialized!")
+        print("Run: python3 markdownos.py --playground")
+        return
+
+    print("\n🎮 Booting Playground System...")
+    print()
+
+    # Create temporary MarkdownOS instance with playground files
+    class PlaygroundOS(MarkdownOS):
+        def __init__(self, base_path):
+            self.base_path = Path(base_path)
+            self.kernel = MarkdownKernel(playground_kernel)
+            self.desktop = MarkdownDesktop(playground_desktop)
+
+    try:
+        os_instance = PlaygroundOS(base_path)
+        os_instance.quiet_boot()
+        print("✓ Playground boot successful!")
+        print()
+    except SystemExit as e:
+        print("\n💥 Playground boot failed!")
+        print("This is expected if you're experimenting.")
+        print("Check the errors above to learn what went wrong.")
+        print()
+        print("To reset: python3 markdownos.py --playground reset")
+        print()
+
+
+def playground_reset():
+    """Reset playground to initial state."""
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    playground_kernel = os.path.join(base_path, "playground-kernel.md")
+    playground_desktop = os.path.join(base_path, "playground-desktop.md")
+
+    print("\n🔄 Resetting playground...")
+
+    # Remove existing files
+    if os.path.exists(playground_kernel):
+        os.remove(playground_kernel)
+    if os.path.exists(playground_desktop):
+        os.remove(playground_desktop)
+
+    # Recreate
+    create_playground_files()
+
+    print("✓ Playground reset to initial state!")
+    print()
+    print("Files restored:")
+    print("  • playground-kernel.md")
+    print("  • playground-desktop.md")
+    print()
+
+
+def playground_challenge(challenge_num):
+    """Start a specific playground challenge."""
+    if challenge_num not in PLAYGROUND_CHALLENGES:
+        print(f"\n❌ Challenge {challenge_num} not found!")
+        print(f"Available challenges: 1-{len(PLAYGROUND_CHALLENGES)}")
+        return
+
+    challenge = PLAYGROUND_CHALLENGES[challenge_num]
+
+    print("\n")
+    print("=" * 60)
+    print(f"CHALLENGE {challenge_num}: {challenge['title']}")
+    print("=" * 60)
+    print()
+    print(f"📚 What you'll learn: {challenge['learning']}")
+    print()
+    print(f"📋 Your task:")
+    print(f"   {challenge['task']}")
+    print()
+    print("=" * 60)
+    print()
+    print("Instructions:")
+    print("  1. Edit playground-kernel.md as described")
+    print("  2. Run: python3 markdownos.py --playground boot")
+    print("  3. Observe what happens (errors are learning!)")
+    print("  4. Run: python3 markdownos.py --playground hint - if stuck")
+    print()
+    print("When done, reset with: python3 markdownos.py --playground reset")
+    print()
+
+
+def playground_hint(challenge_num=None):
+    """Show hint for current or specified challenge."""
+    if challenge_num and challenge_num in PLAYGROUND_CHALLENGES:
+        challenge = PLAYGROUND_CHALLENGES[challenge_num]
+        print("\n💡 HINT:")
+        print(f"   {challenge['hint']}")
+        print()
+    else:
+        print("\n💡 General hints:")
+        print("  • Use --playground challenge <N> to start a challenge")
+        print("  • Edit playground-kernel.md to make changes")
+        print("  • Use --playground boot to test your changes")
+        print("  • Errors are your teachers - read them carefully!")
+        print("  • Use --playground reset to start fresh")
+        print()
+
+
+def playground_list():
+    """List all available challenges."""
+    print("\n" + "=" * 60)
+    print("PLAYGROUND CHALLENGES")
+    print("=" * 60)
+    print()
+
+    for num, challenge in PLAYGROUND_CHALLENGES.items():
+        print(f"Challenge {num}: {challenge['title']}")
+        print(f"  📚 Learn: {challenge['learning']}")
+        print(f"  📋 Task: {challenge['task']}")
+        print()
+
+    print("Start with: python3 markdownos.py --playground challenge 1")
+    print()
+
+
 def explain_concept(topic: str = None):
     """Explain OS concepts in plain language."""
     if topic is None:
@@ -907,6 +1232,41 @@ def main():
             os_instance = MarkdownOS(base_path)
             os_instance.desktop.load()
             os_instance.desktop.show_menu()
+        elif command == "--playground":
+            # Playground subcommands
+            if len(sys.argv) > 2:
+                subcommand = sys.argv[2]
+                if subcommand == "boot":
+                    playground_boot()
+                elif subcommand == "reset":
+                    playground_reset()
+                elif subcommand == "list":
+                    playground_list()
+                elif subcommand == "challenge":
+                    if len(sys.argv) > 3:
+                        try:
+                            challenge_num = int(sys.argv[3])
+                            playground_challenge(challenge_num)
+                        except ValueError:
+                            print("❌ Challenge number must be an integer")
+                    else:
+                        print("❌ Please specify a challenge number")
+                        print("Usage: python3 markdownos.py --playground challenge <N>")
+                elif subcommand == "hint":
+                    if len(sys.argv) > 3:
+                        try:
+                            challenge_num = int(sys.argv[3])
+                            playground_hint(challenge_num)
+                        except ValueError:
+                            playground_hint()
+                    else:
+                        playground_hint()
+                else:
+                    print(f"Unknown playground command: {subcommand}")
+                    print("Try: python3 markdownos.py --playground")
+            else:
+                # Main playground entry point
+                run_playground()
         elif command == "--help":
             print("MarkdownOS Runtime")
             print()
@@ -915,6 +1275,7 @@ def main():
             print("Commands:")
             print("  (none)        - Boot the system")
             print("  --tutorial    - Interactive tutorial for first-time users (recommended!)")
+            print("  --playground  - Enter playground mode (learn by breaking things!)")
             print("  --quiet       - Boot with minimal output (beginner-friendly)")
             print("  --verbose     - Boot with detailed debugging output")
             print("  --simulate    - Preview boot without making changes (safe mode)")
@@ -924,6 +1285,14 @@ def main():
             print("  --menu        - Show application menu")
             print("  --help        - Show this help")
             print()
+            print("Playground Mode:")
+            print("  --playground           - Enter playground (safe experimentation)")
+            print("  --playground list      - List all challenges")
+            print("  --playground challenge <N> - Start challenge N")
+            print("  --playground boot      - Boot playground system")
+            print("  --playground reset     - Reset playground to initial state")
+            print("  --playground hint [N]  - Get hint for challenge N")
+            print()
             print("Output Modes:")
             print("  --quiet: Minimal output (best for beginners)")
             print("  (default): Normal output")
@@ -931,6 +1300,7 @@ def main():
             print()
             print("Learning:")
             print("  🎓 New to MarkdownOS? Try '--tutorial' for a guided experience!")
+            print("  🎮 Learn kernel internals? Try '--playground' to experiment!")
             print("  📚 Learn concepts: '--explain' to see all topics")
             print("  Example: python3 markdownos.py --explain init")
             print()

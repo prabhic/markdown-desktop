@@ -86,6 +86,50 @@ python3 markdownos.py --explain filesystem
 - Build foundational knowledge of system internals
 - Get context-specific examples from the codebase
 
+### Playground Mode (Learn Kernel Internals)
+
+Learn by breaking things! The playground provides a safe, isolated environment to experiment with kernel concepts through hands-on challenges.
+
+```bash
+# Enter the playground
+python3 markdownos.py --playground
+
+# List all challenges
+python3 markdownos.py --playground list
+
+# Start a specific challenge
+python3 markdownos.py --playground challenge 1
+
+# Boot your playground system
+python3 markdownos.py --playground boot
+
+# Reset to start fresh
+python3 markdownos.py --playground reset
+
+# Get hints
+python3 markdownos.py --playground hint
+```
+
+**5 Challenges Available:**
+1. **The Missing Init Mystery** - Learn why PID 1 is essential
+2. **PID Collision Course** - Understand PID uniqueness
+3. **Permission Puzzle** - Master Unix file permissions
+4. **Process Overload** - See how the kernel manages many processes
+5. **The Auto-Start Experiment** - Learn process lifecycle control
+
+**How it works:**
+- Creates isolated `playground-kernel.md` and `playground-desktop.md` files
+- Safe to break - doesn't affect your main system configuration
+- Each challenge teaches a kernel concept through intentional failure
+- Errors become learning opportunities
+- Reset anytime to start fresh
+
+**Use playground mode to:**
+- Learn kernel internals by experimenting
+- Understand what happens when things go wrong
+- Build confidence through hands-on practice
+- Master OS concepts through breaking and fixing
+
 ### Boot the System
 
 ```bash
