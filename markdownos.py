@@ -472,6 +472,54 @@ class MarkdownOS:
         print("  • Learn: markdownos.py --explain init")
         print()
 
+    def verbose_boot(self):
+        """Boot with detailed debugging output."""
+        print("\n")
+        print("╔══════════════════════════════════════════════════════════╗")
+        print("║              🔍 VERBOSE MODE - DETAILED OUTPUT           ║")
+        print("╚══════════════════════════════════════════════════════════╝")
+        print()
+
+        # Load kernel with detailed output
+        print("[VERBOSE] Starting kernel configuration load...")
+        print(f"[VERBOSE] Reading file: {self.kernel.kernel_md_path}")
+        self.kernel.load()
+        print(f"[VERBOSE] ✓ Kernel load complete")
+        print(f"[VERBOSE]   - Processes found: {len(self.kernel.processes)}")
+        for proc in self.kernel.processes:
+            print(f"[VERBOSE]     • {proc.name} (PID {proc.pid}): autostart={proc.autostart}")
+        print(f"[VERBOSE]   - Filesystem entries: {len(self.kernel.filesystem)}")
+        for entry in self.kernel.filesystem:
+            print(f"[VERBOSE]     • {entry.name} (type: {entry.type})")
+        print()
+
+        # Load desktop with detailed output
+        print("[VERBOSE] Starting desktop configuration load...")
+        print(f"[VERBOSE] Reading file: {self.desktop.desktop_md_path}")
+        self.desktop.load()
+        print(f"[VERBOSE] ✓ Desktop load complete")
+        print(f"[VERBOSE]   - Applications found: {len(self.desktop.applications)}")
+        for app in self.desktop.applications:
+            print(f"[VERBOSE]     • {app.display_name}: autostart={app.autostart}")
+        print()
+
+        # Boot kernel with verbose output
+        print("[VERBOSE] Starting kernel boot sequence...")
+        self.kernel.boot()
+
+        # Start desktop with verbose output
+        print("[VERBOSE] Starting desktop environment...")
+        self.desktop.start()
+
+        # Detailed summary
+        print("[VERBOSE] Boot complete - System summary:")
+        print(f"[VERBOSE]   - Total processes: {len(self.kernel.processes)}")
+        print(f"[VERBOSE]   - Running processes: {len([p for p in self.kernel.processes if p.autostart])}")
+        print(f"[VERBOSE]   - Filesystem entries: {len(self.kernel.filesystem)}")
+        print(f"[VERBOSE]   - Desktop apps: {len(self.desktop.applications)}")
+        print(f"[VERBOSE]   - Auto-start apps: {len([a for a in self.desktop.applications if a.autostart])}")
+        print()
+
     def boot(self):
         """Boot the complete system."""
         print("\n")
@@ -554,6 +602,9 @@ def main():
         if command == "--quiet":
             os_instance = MarkdownOS(base_path)
             os_instance.quiet_boot()
+        elif command == "--verbose":
+            os_instance = MarkdownOS(base_path)
+            os_instance.verbose_boot()
         elif command == "--simulate":
             os_instance = MarkdownOS(base_path)
             os_instance.simulate_boot()
@@ -577,6 +628,7 @@ def main():
             print("Commands:")
             print("  (none)        - Boot the system")
             print("  --quiet       - Boot with minimal output (beginner-friendly)")
+            print("  --verbose     - Boot with detailed debugging output")
             print("  --simulate    - Preview boot without making changes (safe mode)")
             print("  --explain     - List all explainable OS concepts")
             print("  --explain <topic> - Explain a specific OS concept (e.g. init, pid)")
@@ -584,9 +636,13 @@ def main():
             print("  --menu        - Show application menu")
             print("  --help        - Show this help")
             print()
+            print("Output Modes:")
+            print("  --quiet: Minimal output (best for beginners)")
+            print("  (default): Normal output")
+            print("  --verbose: Detailed debugging output (for troubleshooting)")
+            print()
             print("Learning:")
             print("  Try '--explain' to see what you can learn!")
-            print("  Try '--quiet' for a cleaner boot experience!")
             print("  Example: python3 markdownos.py --explain init")
             print()
         else:
