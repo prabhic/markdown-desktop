@@ -218,20 +218,62 @@ class Application:
 
 class MarkdownKernel:
     """The kernel component - manages processes and file system."""
-    
+
     def __init__(self, kernel_md_path: str):
         self.kernel_md_path = kernel_md_path
         self.processes: List[Process] = []
         self.filesystem: List[FileSystemEntry] = []
         self.system_info = {}
-        
+
+    def validate(self):
+        """Validate kernel configuration for common errors."""
+        errors = []
+        warnings = []
+
+        # Check: No duplicate PIDs
+        pids = [int(p.pid) for p in self.processes if p.pid.isdigit()]
+        if len(pids) != len(set(pids)):
+            pid_counts = {}
+            for pid in pids:
+                pid_counts[pid] = pid_counts.get(pid, 0) + 1
+            duplicates = [pid for pid, count in pid_counts.items() if count > 1]
+            errors.append(f"Duplicate PIDs found: {duplicates}")
+
+        # Check: PID 1 must exist
+        if 1 not in pids:
+            errors.append("PID 1 (init process) is required but not found!")
+
+        # Warning: Large PIDs
+        if any(pid > 1000 for pid in pids):
+            large_pids = [pid for pid in pids if pid > 1000]
+            warnings.append(f"PIDs over 1000 detected: {large_pids}. Consider using smaller numbers.")
+
+        # Check: Processes have required fields
+        for proc in self.processes:
+            if not proc.pid:
+                errors.append(f"Process '{proc.name}' missing PID")
+            if not proc.command:
+                warnings.append(f"Process '{proc.name}' has no command")
+
+        # Check: Filesystem permissions are valid (basic check)
+        for entry in self.filesystem:
+            if entry.type == "file" and entry.permissions:
+                try:
+                    perm_val = int(entry.permissions, 8)  # Octal
+                    if perm_val > 0o777:
+                        warnings.append(f"File '{entry.name}' has unusual permissions: {entry.permissions}")
+                except ValueError:
+                    errors.append(f"File '{entry.name}' has invalid permissions: {entry.permissions}")
+
+        return errors, warnings
+
     def load(self):
         """Load and parse kernel.md."""
         with open(self.kernel_md_path, 'r') as f:
             content = f.read()
-        
+
         sections = MarkdownParser.parse_sections(content)
-        
+
         # Parse system information
         if "System Information" in content:
             parser = MarkdownParser()
@@ -239,7 +281,7 @@ class MarkdownKernel:
                 'name': parser.parse_key_value(content, "Name"),
                 'version': parser.parse_key_value(content, "Version"),
             }
-        
+
         # Parse processes
         for section_name, section_content in sections.items():
             if section_name.startswith("Process:"):
@@ -249,7 +291,21 @@ class MarkdownKernel:
             elif section_name.startswith("Directory:") or section_name.startswith("File:"):
                 entry = FileSystemEntry(section_name, section_content)
                 self.filesystem.append(entry)
-        
+
+        # Validate after loading
+        errors, warnings = self.validate()
+        if errors:
+            print("\n⚠️  Configuration Errors Found:")
+            for error in errors:
+                print(f"  ❌ {error}")
+            print()
+            sys.exit(1)
+        if warnings:
+            print("\n⚠️  Configuration Warnings:")
+            for warning in warnings:
+                print(f"  ⚠️  {warning}")
+            print()
+
         return self
     
     def boot(self):
