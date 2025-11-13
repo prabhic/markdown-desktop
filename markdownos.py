@@ -607,6 +607,235 @@ class MarkdownOS:
         print()
 
 
+def run_tutorial():
+    """Interactive tutorial for first-time users."""
+    import time
+
+    print("\n")
+    print("╔════════════════════════════════════════════════════════╗")
+    print("║        Welcome to MarkdownOS Tutorial!                ║")
+    print("╚════════════════════════════════════════════════════════╝")
+    print()
+    print("This tutorial will teach you to:")
+    print("  1. Understand how MarkdownOS works")
+    print("  2. Make your first configuration change")
+    print("  3. Boot the system with your changes")
+    print()
+    print("This is a safe, hands-on learning experience!")
+    print("Duration: ~5 minutes")
+    print()
+
+    try:
+        input("Press Enter to start the tutorial (or Ctrl+C to exit)...")
+    except KeyboardInterrupt:
+        print("\n\nTutorial cancelled. Come back anytime!")
+        return
+
+    # Step 1: Understanding the System
+    print("\n" + "=" * 60)
+    print("STEP 1/5: Understanding MarkdownOS")
+    print("=" * 60)
+    print()
+    print("MarkdownOS is configured entirely through markdown files.")
+    print("There are two main files:")
+    print()
+    print("  • kernel.md   - Defines processes and filesystem")
+    print("  • desktop.md  - Defines desktop applications")
+    print()
+    print("Everything you see when the system boots is defined in")
+    print("these files. No code required - just markdown!")
+    print()
+
+    try:
+        input("Press Enter to continue...")
+    except KeyboardInterrupt:
+        print("\n\nTutorial cancelled. Your system is unchanged.")
+        return
+
+    # Step 2: Looking at an Existing Process
+    print("\n" + "=" * 60)
+    print("STEP 2/5: Exploring a Process Definition")
+    print("=" * 60)
+    print()
+    print("Let's look at how a process is defined in kernel.md.")
+    print("Here's the 'logger' process:")
+    print()
+    print("┌─────────────────────────────────────────────┐")
+    print("│ ### Process: logger                         │")
+    print("│ - **PID**: 3                                │")
+    print("│ - **Command**: `echo 'Logger ready'`        │")
+    print("│ - **Working Directory**: `/tmp`             │")
+    print("│ - **Auto Start**: true                      │")
+    print("│ - **Description**: System logging service   │")
+    print("└─────────────────────────────────────────────┘")
+    print()
+    print("Each process has:")
+    print("  • A unique PID (Process ID)")
+    print("  • A command to run")
+    print("  • Auto Start (true = starts on boot)")
+    print("  • A description")
+    print()
+
+    try:
+        input("Press Enter to continue...")
+    except KeyboardInterrupt:
+        print("\n\nTutorial cancelled. Your system is unchanged.")
+        return
+
+    # Step 3: Your First Change
+    print("\n" + "=" * 60)
+    print("STEP 3/5: Making Your First Change")
+    print("=" * 60)
+    print()
+    print("Now YOU'LL add a new process!")
+    print()
+    print("We're going to add a 'welcome' process that displays")
+    print("a message when the system boots.")
+    print()
+    print("The process will look like this:")
+    print()
+    print("┌─────────────────────────────────────────────┐")
+    print("│ ### Process: welcome                        │")
+    print("│ - **PID**: 10                               │")
+    print("│ - **Command**: `echo 'Welcome!'`            │")
+    print("│ - **Working Directory**: `/tmp`             │")
+    print("│ - **Auto Start**: true                      │")
+    print("│ - **Description**: Welcome message          │")
+    print("└─────────────────────────────────────────────┘")
+    print()
+    print("This will be added to your kernel.md file.")
+    print()
+
+    try:
+        response = input("Ready to add this process? (yes/no): ").strip().lower()
+        if response not in ['yes', 'y']:
+            print("\nTutorial cancelled. Your system is unchanged.")
+            return
+    except KeyboardInterrupt:
+        print("\n\nTutorial cancelled. Your system is unchanged.")
+        return
+
+    # Actually add the process
+    print("\nAdding process to kernel.md...")
+    time.sleep(0.5)
+
+    kernel_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kernel.md")
+
+    # Read current content
+    with open(kernel_path, 'r') as f:
+        content = f.read()
+
+    # Check if welcome process already exists
+    if "Process: welcome" in content:
+        print("✓ The 'welcome' process already exists!")
+        print("  (You may have run this tutorial before)")
+    else:
+        # Add the new process
+        new_process = """
+
+### Process: welcome
+- **PID**: 10
+- **Command**: `echo "Welcome to MarkdownOS!"`
+- **Working Directory**: `/tmp`
+- **Auto Start**: true
+- **Description**: Welcome message for new users
+"""
+
+        # Append to file
+        with open(kernel_path, 'a') as f:
+            f.write(new_process)
+
+        print("✓ Process added successfully!")
+
+    print()
+
+    try:
+        input("Press Enter to continue...")
+    except KeyboardInterrupt:
+        print("\n\nNote: The change has been made to kernel.md")
+        print("The system will use this process on next boot.")
+        return
+
+    # Step 4: Validating Your Change
+    print("\n" + "=" * 60)
+    print("STEP 4/5: Validating Your Configuration")
+    print("=" * 60)
+    print()
+    print("Before booting, let's validate the configuration.")
+    print("MarkdownOS checks for common errors like:")
+    print("  • Duplicate PIDs")
+    print("  • Missing required processes (PID 1)")
+    print("  • Invalid permissions")
+    print()
+    print("Running validation...")
+    time.sleep(0.5)
+
+    # Load and validate
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    try:
+        os_instance = MarkdownOS(base_path)
+        os_instance.kernel.load()
+        print("✓ Configuration is valid!")
+        print(f"✓ Found {len(os_instance.kernel.processes)} processes")
+        print("✓ Your 'welcome' process is ready to boot!")
+    except SystemExit:
+        print("\n❌ Validation found errors!")
+        print("The tutorial will help you fix them.")
+        print("Check the error messages above.")
+        return
+
+    print()
+
+    try:
+        input("Press Enter to continue...")
+    except KeyboardInterrupt:
+        print("\n\nYour change is saved and validated!")
+        return
+
+    # Step 5: Boot and See Your Change
+    print("\n" + "=" * 60)
+    print("STEP 5/5: Booting Your System")
+    print("=" * 60)
+    print()
+    print("Now let's boot MarkdownOS and see your process in action!")
+    print()
+
+    try:
+        input("Press Enter to boot the system...")
+    except KeyboardInterrupt:
+        print("\n\nYou can boot manually later with: python3 markdownos.py")
+        return
+
+    print()
+    print("Booting in quiet mode to see your process clearly...")
+    print()
+    time.sleep(1)
+
+    # Boot in quiet mode
+    os_instance.quiet_boot()
+
+    # Show completion
+    print()
+    print("=" * 60)
+    print("🎉 TUTORIAL COMPLETE!")
+    print("=" * 60)
+    print()
+    print("Congratulations! You've successfully:")
+    print("  ✓ Learned how MarkdownOS works")
+    print("  ✓ Added a new process to kernel.md")
+    print("  ✓ Validated your configuration")
+    print("  ✓ Booted the system with your changes")
+    print()
+    print("What's next?")
+    print("  • Try adding more processes to kernel.md")
+    print("  • Explore desktop.md to add applications")
+    print("  • Use '--explain' to learn more concepts")
+    print("  • Use '--simulate' to preview changes safely")
+    print()
+    print("You're now a MarkdownOS user! 🚀")
+    print()
+
+
 def explain_concept(topic: str = None):
     """Explain OS concepts in plain language."""
     if topic is None:
@@ -655,7 +884,9 @@ def main():
         command = sys.argv[1]
         base_path = os.path.dirname(os.path.abspath(__file__))
 
-        if command == "--quiet":
+        if command == "--tutorial":
+            run_tutorial()
+        elif command == "--quiet":
             os_instance = MarkdownOS(base_path)
             os_instance.quiet_boot()
         elif command == "--verbose":
@@ -683,6 +914,7 @@ def main():
             print()
             print("Commands:")
             print("  (none)        - Boot the system")
+            print("  --tutorial    - Interactive tutorial for first-time users (recommended!)")
             print("  --quiet       - Boot with minimal output (beginner-friendly)")
             print("  --verbose     - Boot with detailed debugging output")
             print("  --simulate    - Preview boot without making changes (safe mode)")
@@ -698,7 +930,8 @@ def main():
             print("  --verbose: Detailed debugging output (for troubleshooting)")
             print()
             print("Learning:")
-            print("  Try '--explain' to see what you can learn!")
+            print("  🎓 New to MarkdownOS? Try '--tutorial' for a guided experience!")
+            print("  📚 Learn concepts: '--explain' to see all topics")
             print("  Example: python3 markdownos.py --explain init")
             print()
         else:
