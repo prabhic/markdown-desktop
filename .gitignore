@@ -36,3 +36,7 @@ htmlcov/
 
 # Session files
 .desktop-session.md
+
+# Playground files (local experimentation)
+playground-kernel.md
+playground-desktop.md
