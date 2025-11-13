@@ -25,6 +25,26 @@ These are defined declaratively in markdown and interpreted by the runtime.
 
 ## Quick Start
 
+### Quiet Mode (Beginner-Friendly)
+
+Boot the system with minimal, clean output - perfect for beginners!
+
+```bash
+python3 markdownos.py --quiet
+```
+
+This will:
+1. Boot the system silently
+2. Show a clean success message
+3. Display key system stats (processes, files, apps)
+4. Suggest helpful next commands
+
+**Use quiet mode when:**
+- You want a cleaner, less overwhelming experience
+- You're new to MarkdownOS
+- You don't need detailed boot logs
+- You want quick confirmation the system works
+
 ### Simulation Mode (Safe Experimentation)
 
 Preview system behavior without making any changes - perfect for learning!

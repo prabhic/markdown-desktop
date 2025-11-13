@@ -445,6 +445,33 @@ class MarkdownOS:
         print("To see more options, run: python3 markdownos.py --help")
         print()
 
+    def quiet_boot(self):
+        """Boot with minimal, beginner-friendly output."""
+        # Load configurations silently
+        self.kernel.load()
+        self.desktop.load()
+
+        # Count what's running
+        num_processes = len([p for p in self.kernel.processes if p.autostart])
+        num_files = len(self.kernel.filesystem)
+        num_apps = len(self.desktop.applications)
+
+        # Show minimal, encouraging output
+        print()
+        print("╔══════════════════════════════════════════╗")
+        print("║      MarkdownOS v0.1.0                   ║")
+        print("╚══════════════════════════════════════════╝")
+        print()
+        print("✓ System booted successfully!")
+        print(f"✓ {num_processes} processes running")
+        print(f"✓ {num_files} filesystem entries ready")
+        print(f"✓ {num_apps} applications available")
+        print()
+        print("What's next?")
+        print("  • Try: markdownos.py --status")
+        print("  • Learn: markdownos.py --explain init")
+        print()
+
     def boot(self):
         """Boot the complete system."""
         print("\n")
@@ -524,7 +551,10 @@ def main():
         command = sys.argv[1]
         base_path = os.path.dirname(os.path.abspath(__file__))
 
-        if command == "--simulate":
+        if command == "--quiet":
+            os_instance = MarkdownOS(base_path)
+            os_instance.quiet_boot()
+        elif command == "--simulate":
             os_instance = MarkdownOS(base_path)
             os_instance.simulate_boot()
         elif command == "--explain":
@@ -546,6 +576,7 @@ def main():
             print()
             print("Commands:")
             print("  (none)        - Boot the system")
+            print("  --quiet       - Boot with minimal output (beginner-friendly)")
             print("  --simulate    - Preview boot without making changes (safe mode)")
             print("  --explain     - List all explainable OS concepts")
             print("  --explain <topic> - Explain a specific OS concept (e.g. init, pid)")
@@ -555,6 +586,7 @@ def main():
             print()
             print("Learning:")
             print("  Try '--explain' to see what you can learn!")
+            print("  Try '--quiet' for a cleaner boot experience!")
             print("  Example: python3 markdownos.py --explain init")
             print()
         else:
